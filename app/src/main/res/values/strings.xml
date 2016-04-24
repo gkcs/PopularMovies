@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PopularMovies</string>
+    <string name="action_settings">Settings</string>
+    <string name="movie">Movie</string>
+    <string name="app_title">Movies App</string>
+    <string name="sort_key">SORT_BY</string>
+    <string name="sort_value">POPULARITY</string>
+</resources>
