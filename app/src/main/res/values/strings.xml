@@ -5,4 +5,5 @@
     <string name="app_title">Movies App</string>
     <string name="sort_key">SORT_BY</string>
     <string name="sort_value">POPULARITY</string>
+    <string name="action_sort">Sort</string>
 </resources>

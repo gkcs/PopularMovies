@@ -1,12 +1,22 @@
 package udacity.android.gkcs.popularmovies;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -14,10 +24,50 @@ public class MovieFragment extends Fragment {
 
     private ArrayAdapter<Movie> movieAdapter;
 
+    public MovieFragment() {
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.moviechoice, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_sort) {
+            getMovieData();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        movieAdapter =
+                new ArrayAdapter<>(
+                        getActivity(),
+                        R.layout.fragment_detail,
+                        R.id.movies_grid,
+                        new ArrayList<Movie>());
+        final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        final GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
+        gridView.setAdapter(movieAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                startActivity(new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, movieAdapter.getItem(position).getId()));
+            }
+        });
+        return rootView;
     }
 
     @Override
@@ -36,7 +86,7 @@ public class MovieFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(String... params) {
-            Movie[] movies = HttpClient.getHttpClient().getMovies();
+            final Movie[] movies = HttpClient.getHttpClient().getMovies();
             if ("POPULARITY".equals(params[0])) {
                 Arrays.sort(movies, new Comparator<Movie>() {
                     @Override
