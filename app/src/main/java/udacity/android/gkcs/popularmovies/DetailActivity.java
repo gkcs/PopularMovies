@@ -52,7 +52,7 @@ public class DetailActivity extends ActionBarActivity {
 
         private static final String TAG = DetailFragment.class.getSimpleName();
         private Movie selectedMovie = new Movie("", "", "", "", "", 0d, 0d);
-        private String mMovieSorting;
+        private String movieId;
 
         public DetailFragment() {
             setHasOptionsMenu(true);
@@ -64,8 +64,16 @@ public class DetailActivity extends ActionBarActivity {
             final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
             final Intent intent = getActivity().getIntent();
             Log.d(TAG, "onCreateView: STARTED THE VIEWS");
+//            fillMovieData(rootView, intent);
+            Log.d(TAG, "onCreateView: DONE WITH VIEWS");
+            return rootView;
+        }
+
+        private void fillMovieData(View rootView, Intent intent) {
             if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-                mMovieSorting = intent.getStringExtra(Intent.EXTRA_TEXT);
+                movieId = intent.getStringExtra(Intent.EXTRA_TEXT);
+                MovieByIdTask movieByIdTask = new MovieByIdTask();
+                movieByIdTask.execute(movieId);
                 TextView viewById = (TextView) rootView.findViewById(R.id.movie_title);
                 viewById.setText(selectedMovie.getTitle());
                 ImageView imageview = (ImageView) rootView.findViewById(R.id.movie_image);
@@ -77,8 +85,6 @@ public class DetailActivity extends ActionBarActivity {
                 TextView viewById3 = (TextView) rootView.findViewById(R.id.movie_release_date);
                 viewById3.setText(selectedMovie.getRelease_date());
             }
-            Log.d(TAG, "onCreateView: DONE WITH VIEWS");
-            return rootView;
         }
 
 
@@ -86,6 +92,7 @@ public class DetailActivity extends ActionBarActivity {
 
             @Override
             protected Movie doInBackground(String... params) {
+                Log.i(TAG, "doInBackground: GETTING MOVIE");
                 return HttpClient.getHttpClient().getMovieById(params[0]);
             }
 

@@ -58,8 +58,8 @@ public class MovieFragment extends Fragment {
         movieAdapter =
                 new ArrayAdapter<>(
                         getActivity(),
-                        R.layout.fragment_detail,
-                        R.id.movies_grid,
+                        R.layout.list_item_forcast,
+                        R.id.list_item_forecast_text,
                         new ArrayList<Movie>());
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         Log.d(TAG, "onCreateView: GRID VIEW TO BE MADE");
@@ -94,6 +94,7 @@ public class MovieFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(String... params) {
+            Log.i(TAG, "doInBackground: GETTING THE MOVIES");
             final Movie[] movies = HttpClient.getHttpClient().getMovies();
             if ("POPULARITY".equals(params[0])) {
                 Arrays.sort(movies, new Comparator<Movie>() {
