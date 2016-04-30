@@ -1,11 +1,14 @@
 package udacity.android.gkcs.popularmovies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +24,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class MovieFragment extends Fragment {
+
+    private static final String TAG = MovieFragment.class.getSimpleName();
 
     private ArrayAdapter<Movie> movieAdapter;
 
@@ -57,7 +62,9 @@ public class MovieFragment extends Fragment {
                         R.id.movies_grid,
                         new ArrayList<Movie>());
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        Log.d(TAG, "onCreateView: GRID VIEW TO BE MADE");
         final GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
+        Log.d(TAG, "onCreateView: GRID VIEW DONE");
         gridView.setAdapter(movieAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -77,9 +84,10 @@ public class MovieFragment extends Fragment {
     }
 
     private void getMovieData() {
-        new MovieTask().execute(PreferenceManager.getDefaultSharedPreferences(getActivity())
-                .getString(getString(R.string.sort_key),
-                        getString(R.string.sort_value)));
+        MovieTask movieTask = new MovieTask();
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String string = defaultSharedPreferences.getString(getString(R.string.sort_key), getString(R.string.sort_value));
+        movieTask.execute(string);
     }
 
     public class MovieTask extends AsyncTask<String, Void, Movie[]> {
@@ -107,12 +115,14 @@ public class MovieFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Movie[] result) {
+            Log.d(TAG, "STARTED FILLING ADAPTER");
             if (result != null) {
                 movieAdapter.clear();
                 for (final Movie movie : result) {
                     movieAdapter.add(movie);
                 }
             }
+            Log.d(TAG, "DONE FILLING ADAPTER");
         }
 
         private int getCeiledDiff(double diff) {
@@ -151,34 +161,45 @@ class Movie {
 
 
     public String getImage() {
-        return image;
+        return getNotNullObject(image);
     }
 
     public String getOverview() {
-        return overview;
+        return getNotNullObject(overview);
     }
 
     public String getRelease_date() {
-        return release_date;
+        return getNotNullObject(release_date);
     }
 
     public String getTitle() {
-        return title;
+        return getNotNullObject(title);
     }
 
     public Double getPopularity() {
-        return popularity;
+        return getNotNullObject(popularity);
     }
 
     public Double getVote_average() {
-        return vote_average;
+        return getNotNullObject(vote_average);
     }
 
     public String getId() {
-        return id;
+        return getNotNullObject(id);
     }
 
-    public Movie(String id, final String image,
+    @NonNull
+    private Double getNotNullObject(final Double popularity) {
+        return popularity == null ? 0d : popularity;
+    }
+
+    @NonNull
+    private String getNotNullObject(final String string) {
+        return string == null ? "ABC" : string;
+    }
+
+    public Movie(final String id,
+                 final String image,
                  final String overview,
                  final String release_date,
                  final String title,
