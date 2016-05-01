@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,21 +21,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class MovieFragment extends Fragment {
+public class MovieFragment extends Fragment implements Preference.OnPreferenceChangeListener {
 
     private static final String TAG = MovieFragment.class.getSimpleName();
 
     private MovieArrayAdapter movieAdapter;
-    private static final Gson gson = new Gson();
-
-    public MovieFragment() {
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,11 +62,10 @@ public class MovieFragment extends Fragment {
         Log.d(TAG, "onCreateView: GRID VIEW DONE");
         gridView.setAdapter(movieAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 startActivity(new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, gson.toJson(movieAdapter.getItem(position))));
+                        .putExtra("movie", movieAdapter.getItem(position)));
             }
         });
         return rootView;
@@ -89,7 +85,7 @@ public class MovieFragment extends Fragment {
     }
 
     @NonNull
-    private Comparator<Movie> getRatingComparator() {
+    private static Comparator<Movie> getRatingComparator() {
         return new Comparator<Movie>() {
             @Override
             public int compare(Movie lhs, Movie rhs) {
@@ -99,7 +95,7 @@ public class MovieFragment extends Fragment {
     }
 
     @NonNull
-    private Comparator<Movie> getPopularityComparator() {
+    private static Comparator<Movie> getPopularityComparator() {
         return new Comparator<Movie>() {
             @Override
             public int compare(Movie lhs, Movie rhs) {
@@ -108,10 +104,10 @@ public class MovieFragment extends Fragment {
         };
     }
 
-    private int getCeiledDiff(double diff) {
-        if (diff > 0) {
+    private static int getCeiledDiff(double diff) {
+        if (diff < 0) {
             return 1;
-        } else if (diff < 0) {
+        } else if (diff > 0) {
             return -1;
         } else {
             return 0;
@@ -128,11 +124,18 @@ public class MovieFragment extends Fragment {
     }
 
     public void updateSortingOrder(final String sortingOrder) {
+        Log.d(TAG, "updateSortingOrder: PREFERENCE HAS CHANGED!!");
         if ("Popularity".equals(sortingOrder)) {
             movieAdapter.sort(getPopularityComparator());
         } else {
             movieAdapter.sort(getRatingComparator());
         }
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object changedValue) {
+        updateSortingOrder(changedValue.toString());
+        return false;
     }
 
     public class MovieTask extends AsyncTask<String, Void, Movie[]> {
@@ -158,7 +161,7 @@ public class MovieFragment extends Fragment {
     }
 }
 
-class Movie {
+class Movie implements Parcelable {
     @Override
     public String toString() {
         return "Movie{" +
@@ -225,6 +228,55 @@ class Movie {
         this.popularity = popularity;
         this.vote_average = vote_average;
     }
+
+    protected Movie(Parcel in) {
+        id = in.readString();
+        poster_path = in.readString();
+        overview = in.readString();
+        release_date = in.readString();
+        title = in.readString();
+        popularity = in.readByte() == 0x00 ? null : in.readDouble();
+        vote_average = in.readByte() == 0x00 ? null : in.readDouble();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(poster_path);
+        dest.writeString(overview);
+        dest.writeString(release_date);
+        dest.writeString(title);
+        if (popularity == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeDouble(popularity);
+        }
+        if (vote_average == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeDouble(vote_average);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }
 
 class MovieResult {
