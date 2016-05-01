@@ -26,10 +26,6 @@ public class HttpClient {
         return getMovies(MOVIE_ADDRESS + "top_rated?");
     }
 
-    public Movie getMovieById(String id) {
-        return getMovies(MOVIE_ADDRESS + id + "?")[0];
-    }
-
     private Movie[] getMovies(String url) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;

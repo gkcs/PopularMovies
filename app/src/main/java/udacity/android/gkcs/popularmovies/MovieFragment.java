@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,8 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +27,8 @@ public class MovieFragment extends Fragment {
 
     private static final String TAG = MovieFragment.class.getSimpleName();
 
-    private ArrayAdapter<Movie> movieAdapter;
+    private MovieArrayAdapter movieAdapter;
+    private static final Gson gson = new Gson();
 
     public MovieFragment() {
     }
@@ -56,11 +57,7 @@ public class MovieFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         movieAdapter =
-                new ArrayAdapter<>(
-                        getActivity(),
-                        R.layout.list_item_forcast,
-                        R.id.list_item_forecast_text,
-                        new ArrayList<Movie>());
+                new MovieArrayAdapter(getActivity(), R.layout.list_item_forecast, new ArrayList<Movie>());
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         Log.d(TAG, "onCreateView: GRID VIEW TO BE MADE");
         final GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
@@ -71,7 +68,7 @@ public class MovieFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 startActivity(new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, movieAdapter.getItem(position).getId()));
+                        .putExtra(Intent.EXTRA_TEXT, gson.toJson(movieAdapter.getItem(position))));
             }
         });
         return rootView;
@@ -143,7 +140,7 @@ class Movie {
     public String toString() {
         return "Movie{" +
                 "id='" + id + '\'' +
-                ", image='" + image + '\'' +
+                ", image='" + poster_path + '\'' +
                 ", overview='" + overview + '\'' +
                 ", release_date='" + release_date + '\'' +
                 ", title='" + title + '\'' +
@@ -153,7 +150,7 @@ class Movie {
     }
 
     private final String id;
-    private final String image;
+    private final String poster_path;
     private final String overview;
     private final String release_date;
     private final String title;
@@ -162,52 +159,43 @@ class Movie {
 
 
     public String getImage() {
-        return getNotNullObject(image);
+        return poster_path;
     }
 
     public String getOverview() {
-        return getNotNullObject(overview);
+        return (overview);
     }
 
     public String getRelease_date() {
-        return getNotNullObject(release_date);
+        return (release_date);
     }
 
     public String getTitle() {
-        return getNotNullObject(title);
+        return (title);
     }
 
     public Double getPopularity() {
-        return getNotNullObject(popularity);
+        return (popularity);
     }
 
     public Double getVote_average() {
-        return getNotNullObject(vote_average);
+        return (vote_average);
     }
 
     public String getId() {
-        return getNotNullObject(id);
+        return (id);
     }
 
-    @NonNull
-    private Double getNotNullObject(final Double popularity) {
-        return popularity == null ? 0d : popularity;
-    }
-
-    @NonNull
-    private String getNotNullObject(final String string) {
-        return string == null ? "ABC" : string;
-    }
 
     public Movie(final String id,
-                 final String image,
+                 final String poster_path,
                  final String overview,
                  final String release_date,
                  final String title,
                  final Double popularity,
                  final Double vote_average) {
         this.id = id;
-        this.image = image;
+        this.poster_path = poster_path;
         this.overview = overview;
         this.release_date = release_date;
         this.title = title;

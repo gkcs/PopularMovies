@@ -6,4 +6,6 @@
     <string name="sort_key">SORT_BY</string>
     <string name="sort_value">POPULARITY</string>
     <string name="action_sort">Sort</string>
+    <string name="title_activity_detail">Movie Details</string>
+    <string name="title_activity_settings">Settings</string>
 </resources>
