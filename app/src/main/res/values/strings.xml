@@ -4,7 +4,7 @@
     <string name="movie">Movie</string>
     <string name="app_title">Movies App</string>
     <string name="sort_key">SORT_BY</string>
-    <string name="sort_value">POPULARITY</string>
+    <string name="sort_value">Popularity</string>
     <string name="title_activity_detail">Movie Details</string>
     <string name="title_activity_settings">Settings</string>
     <string name="content_display">OVERVIEW:\n%1$s</string>
