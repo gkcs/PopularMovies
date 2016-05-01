@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,10 +21,9 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 
-public class MovieFragment extends Fragment implements Preference.OnPreferenceChangeListener {
+public class MovieFragment extends Fragment {
 
     private static final String TAG = MovieFragment.class.getSimpleName();
 
@@ -39,13 +37,17 @@ public class MovieFragment extends Fragment implements Preference.OnPreferenceCh
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.moviechoice, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected: MENU ITEM SELECTED: " + item.toString());
         if (item.getItemId() == R.id.action_sort) {
-            getMovieData();
+            sortAdapter(PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .getString(getString(R.string.sort_key),
+                            getString(R.string.sort_value)));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -54,8 +56,7 @@ public class MovieFragment extends Fragment implements Preference.OnPreferenceCh
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        movieAdapter =
-                new MovieArrayAdapter(getActivity(), R.layout.fragment_main, new ArrayList<Movie>());
+        movieAdapter = new MovieArrayAdapter(getActivity(), R.layout.fragment_main, new ArrayList<Movie>());
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         Log.d(TAG, "onCreateView: GRID VIEW TO BE MADE");
         final GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
@@ -121,10 +122,13 @@ public class MovieFragment extends Fragment implements Preference.OnPreferenceCh
                 movieAdapter.add(movie);
             }
         }
+        sortAdapter(PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .getString(getString(R.string.sort_key),
+                        getString(R.string.sort_value)));
     }
 
-    public void updateSortingOrder(final String sortingOrder) {
-        Log.d(TAG, "updateSortingOrder: PREFERENCE HAS CHANGED!!");
+    public void sortAdapter(final String sortingOrder) {
+        Log.d(TAG, "sortAdapter: PREFERENCE HAS CHANGED!!");
         if ("Popularity".equals(sortingOrder)) {
             movieAdapter.sort(getPopularityComparator());
         } else {
@@ -132,24 +136,12 @@ public class MovieFragment extends Fragment implements Preference.OnPreferenceCh
         }
     }
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object changedValue) {
-        updateSortingOrder(changedValue.toString());
-        return false;
-    }
-
     public class MovieTask extends AsyncTask<String, Void, Movie[]> {
 
         @Override
         protected Movie[] doInBackground(String... params) {
             Log.i(TAG, "doInBackground: GETTING THE MOVIES");
-            final Movie[] movies = HttpClient.getHttpClient().getMovies();
-            if ("POPULARITY".equals(params[0])) {
-                Arrays.sort(movies, getPopularityComparator());
-            } else {
-                Arrays.sort(movies, getRatingComparator());
-            }
-            return movies;
+            return HttpClient.getHttpClient().getMovies();
         }
 
         @Override
