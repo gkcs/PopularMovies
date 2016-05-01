@@ -38,13 +38,12 @@ public class MovieFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.moviechoice, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d(TAG, "onOptionsItemSelected: MENU ITEM SELECTED: " + item.toString());
-        if (item.getItemId() == R.id.action_sort) {
+        if (item.getItemId() == R.id.action_settings) {
             sortAdapter(PreferenceManager.getDefaultSharedPreferences(getActivity())
                     .getString(getString(R.string.sort_key),
                             getString(R.string.sort_value)));
