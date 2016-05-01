@@ -2,13 +2,15 @@ package udacity.android.gkcs.popularmovies;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
-
-    //Picasso.with(context).load("http://i.imgur.com/DvpvklR.png").into(imageView);
+public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

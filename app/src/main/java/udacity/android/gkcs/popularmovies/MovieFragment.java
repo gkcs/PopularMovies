@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -57,7 +58,7 @@ public class MovieFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         movieAdapter =
-                new MovieArrayAdapter(getActivity(), R.layout.list_item_forecast, new ArrayList<Movie>());
+                new MovieArrayAdapter(getActivity(), R.layout.fragment_main, new ArrayList<Movie>());
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         Log.d(TAG, "onCreateView: GRID VIEW TO BE MADE");
         final GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
@@ -87,6 +88,53 @@ public class MovieFragment extends Fragment {
         movieTask.execute(string);
     }
 
+    @NonNull
+    private Comparator<Movie> getRatingComparator() {
+        return new Comparator<Movie>() {
+            @Override
+            public int compare(Movie lhs, Movie rhs) {
+                return getCeiledDiff(lhs.getVote_average() - rhs.getVote_average());
+            }
+        };
+    }
+
+    @NonNull
+    private Comparator<Movie> getPopularityComparator() {
+        return new Comparator<Movie>() {
+            @Override
+            public int compare(Movie lhs, Movie rhs) {
+                return getCeiledDiff(lhs.getPopularity() - rhs.getPopularity());
+            }
+        };
+    }
+
+    private int getCeiledDiff(double diff) {
+        if (diff > 0) {
+            return 1;
+        } else if (diff < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+
+    private void updateMovieList(Movie[] result) {
+        if (result != null) {
+            movieAdapter.clear();
+            for (final Movie movie : result) {
+                movieAdapter.add(movie);
+            }
+        }
+    }
+
+    public void updateSortingOrder(final String sortingOrder) {
+        if ("Popularity".equals(sortingOrder)) {
+            movieAdapter.sort(getPopularityComparator());
+        } else {
+            movieAdapter.sort(getRatingComparator());
+        }
+    }
+
     public class MovieTask extends AsyncTask<String, Void, Movie[]> {
 
         @Override
@@ -94,19 +142,9 @@ public class MovieFragment extends Fragment {
             Log.i(TAG, "doInBackground: GETTING THE MOVIES");
             final Movie[] movies = HttpClient.getHttpClient().getMovies();
             if ("POPULARITY".equals(params[0])) {
-                Arrays.sort(movies, new Comparator<Movie>() {
-                    @Override
-                    public int compare(Movie lhs, Movie rhs) {
-                        return getCeiledDiff(lhs.getPopularity() - rhs.getPopularity());
-                    }
-                });
+                Arrays.sort(movies, getPopularityComparator());
             } else {
-                Arrays.sort(movies, new Comparator<Movie>() {
-                    @Override
-                    public int compare(Movie lhs, Movie rhs) {
-                        return getCeiledDiff(lhs.getVote_average() - rhs.getVote_average());
-                    }
-                });
+                Arrays.sort(movies, getRatingComparator());
             }
             return movies;
         }
@@ -114,23 +152,8 @@ public class MovieFragment extends Fragment {
         @Override
         protected void onPostExecute(Movie[] result) {
             Log.d(TAG, "STARTED FILLING ADAPTER");
-            if (result != null) {
-                movieAdapter.clear();
-                for (final Movie movie : result) {
-                    movieAdapter.add(movie);
-                }
-            }
+            updateMovieList(result);
             Log.d(TAG, "DONE FILLING ADAPTER");
-        }
-
-        private int getCeiledDiff(double diff) {
-            if (diff > 0) {
-                return 1;
-            } else if (diff < 0) {
-                return -1;
-            } else {
-                return 0;
-            }
         }
     }
 }

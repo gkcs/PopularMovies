@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:title="Sort movies by"
+        android:title="Sort Category"
         android:key="@string/sort_key"
         android:defaultValue="@string/sort_value"
         android:entryValues="@array/sort_values"

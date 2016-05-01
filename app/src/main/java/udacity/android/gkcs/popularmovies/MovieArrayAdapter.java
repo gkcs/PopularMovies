@@ -16,8 +16,8 @@ import java.util.List;
 public class MovieArrayAdapter extends ArrayAdapter<Movie> {
     private static final String LOG_TAG = MovieArrayAdapter.class.getSimpleName();
 
-    public MovieArrayAdapter(Activity context, int resource, List<Movie> Movies) {
-        super(context, resource, Movies);
+    public MovieArrayAdapter(Activity context, int resource, List<Movie> movies) {
+        super(context, resource, movies);
     }
 
     @Override
@@ -25,12 +25,12 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         Movie movie = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.fragment_detail, parent, false);
+                    R.layout.grid_item_movie, parent, false);
         }
         String path = "http://image.tmdb.org/t/p/w185" + movie.getImage();
         Log.i(LOG_TAG, "getView: path --> " + path);
-        Picasso.with(getContext()).load(path).into((ImageView) convertView.findViewById(R.id.movie_image));
-        ((TextView) convertView.findViewById(R.id.movie_title)).setText(movie.getTitle());
+        ((TextView) convertView.findViewById(R.id.grid_movie_title)).setText(movie.getTitle());
+        Picasso.with(getContext()).load(path).into((ImageView) convertView.findViewById(R.id.grid_movie_image));
         return convertView;
     }
 }

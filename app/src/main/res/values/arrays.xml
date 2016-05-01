@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="sort_values">
-        <item>popularity</item>
-        <item>user feedback</item>
+        <item>Popularity</item>
+        <item>User Feedback</item>
     </string-array>
     <string-array name="sort_options">
-        <item>popularity</item>
-        <item>user feedback</item>
+        <item>Popularity</item>
+        <item>User Feedback</item>
     </string-array>
 </resources>
