@@ -1,51 +1,63 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingEnd="@dimen/activity_horizontal_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingStart="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".DetailActivity.DetailFragment">
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
 
-    <TextView
-        android:id="@+id/movie_title"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:typeface="sans" />
+        android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/movie_image"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_below="@+id/movie_title"
-        android:contentDescription="@string/movie"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:scaleType="centerCrop" />
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            tools:context=".DetailActivity.DetailFragment">
 
-    <TextView
-        android:id="@+id/movie_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/movie_image"
-        android:paddingTop="@dimen/activity_vertical_margin" />
+            <TextView
+                android:id="@+id/movie_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:typeface="sans" />
 
-    <TextView
-        android:id="@+id/movie_rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/movie_text"
-        android:paddingTop="@dimen/activity_vertical_margin" />
+            <ImageView
+                android:id="@+id/movie_image"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_below="@+id/movie_title"
+                android:contentDescription="@string/movie"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:scaleType="centerCrop" />
 
-    <TextView
-        android:id="@+id/movie_release_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/movie_rating"
-        android:paddingTop="@dimen/activity_vertical_margin" />
-</RelativeLayout>
+            <TextView
+                android:id="@+id/movie_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/movie_image"
+                android:paddingTop="@dimen/activity_vertical_margin" />
+
+            <TextView
+                android:id="@+id/movie_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/movie_text"
+                android:paddingTop="@dimen/activity_vertical_margin" />
+
+            <TextView
+                android:id="@+id/movie_release_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/movie_rating"
+                android:paddingTop="@dimen/activity_vertical_margin" />
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>
