@@ -71,8 +71,8 @@ public class DetailActivity extends ActionBarActivity {
         private void fillMovieData(View rootView, Intent intent) {
             if (intent != null) {
                 selectedMovie = intent.getParcelableExtra("movie");
-                final String path = "http://image.tmdb.org/t/p/w185" + selectedMovie.getImage();
                 ((TextView) rootView.findViewById(R.id.movie_title)).setText(selectedMovie.getTitle());
+                final String path = "http://image.tmdb.org/t/p/w185" + selectedMovie.getImage();
                 Picasso.with(getContext()).load(path).into((ImageView) rootView.findViewById(R.id.movie_image));
                 final Resources resources = getResources();
                 ((TextView) rootView.findViewById(R.id.movie_text))

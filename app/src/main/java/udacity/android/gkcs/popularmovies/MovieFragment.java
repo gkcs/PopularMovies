@@ -1,7 +1,6 @@
 package udacity.android.gkcs.popularmovies;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -78,10 +77,8 @@ public class MovieFragment extends Fragment {
     }
 
     private void getMovieData() {
-        MovieTask movieTask = new MovieTask();
-        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String string = defaultSharedPreferences.getString(getString(R.string.sort_key), getString(R.string.sort_value));
-        movieTask.execute(string);
+        new MoviesTask().execute(PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .getString(getString(R.string.sort_key), getString(R.string.sort_value)));
     }
 
     @NonNull
@@ -114,16 +111,44 @@ public class MovieFragment extends Fragment {
         }
     }
 
-    private void updateMovieList(Movie[] result) {
-        if (result != null) {
+    private void updateMovieList(Movie[] movies) {
+        if (movies != null) {
             movieAdapter.clear();
-            for (final Movie movie : result) {
+            for (final Movie movie : movies) {
                 movieAdapter.add(movie);
             }
         }
         sortAdapter(PreferenceManager.getDefaultSharedPreferences(getActivity())
                 .getString(getString(R.string.sort_key),
                         getString(R.string.sort_value)));
+    }
+
+    private void updateMovie(TrailerResult trailerResult) {
+        if (trailerResult != null) {
+            for (int i = 0; i < movieAdapter.getCount(); i++) {
+                if (movieAdapter.getItem(i).getId().equals(trailerResult.getId())) {
+                    movieAdapter.getItem(i).setTrailers(trailerResult.getResults());
+                    movieAdapter.notifyDataSetChanged();
+                    break;
+                }
+            }
+        } else {
+            Log.i(TAG, "updateMovie: Cannot set null trailerResult in movie list");
+        }
+    }
+
+    private void updateMovie(ReviewResult reviewResult) {
+        if (reviewResult != null) {
+            for (int i = 0; i < movieAdapter.getCount(); i++) {
+                if (movieAdapter.getItem(i).getId().equals(reviewResult.getId())) {
+                    movieAdapter.getItem(i).setReviews(reviewResult.getResults());
+                    movieAdapter.notifyDataSetChanged();
+                    break;
+                }
+            }
+        } else {
+            Log.i(TAG, "updateMovie: Cannot set null reviewResult in movie list");
+        }
     }
 
     public void sortAdapter(final String sortingOrder) {
@@ -135,7 +160,7 @@ public class MovieFragment extends Fragment {
         }
     }
 
-    public class MovieTask extends AsyncTask<String, Void, Movie[]> {
+    public class MoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         @Override
         protected Movie[] doInBackground(String... params) {
@@ -150,22 +175,41 @@ public class MovieFragment extends Fragment {
             Log.d(TAG, "DONE FILLING ADAPTER");
         }
     }
+
+    public class MovieTrailerTask extends AsyncTask<String, Void, TrailerResult> {
+
+        @Override
+        protected TrailerResult doInBackground(String... params) {
+            Log.i(TAG, "doInBackground: GETTING THE MOVIE TRAILERS");
+            return HttpClient.getHttpClient().getMovieDetails(params[0], "videos", TrailerResult.class);
+        }
+
+        @Override
+        protected void onPostExecute(TrailerResult result) {
+            Log.d(TAG, "STARTED FILLING Trailer ADAPTER");
+            updateMovie(result);
+            Log.d(TAG, "DONE FILLING Trailer ADAPTER");
+        }
+    }
+
+    public class MovieReviewTask extends AsyncTask<String, Void, ReviewResult> {
+
+        @Override
+        protected ReviewResult doInBackground(String... params) {
+            Log.i(TAG, "doInBackground: GETTING THE MOVIE REVIEWS");
+            return HttpClient.getHttpClient().getMovieDetails(params[0], "reviews", ReviewResult.class);
+        }
+
+        @Override
+        protected void onPostExecute(ReviewResult result) {
+            Log.d(TAG, "STARTED FILLING Review ADAPTER");
+            updateMovie(result);
+            Log.d(TAG, "DONE FILLING Review ADAPTER");
+        }
+    }
 }
 
 class Movie implements Parcelable {
-    @Override
-    public String toString() {
-        return "Movie{" +
-                "id='" + id + '\'' +
-                ", image='" + poster_path + '\'' +
-                ", overview='" + overview + '\'' +
-                ", release_date='" + release_date + '\'' +
-                ", title='" + title + '\'' +
-                ", popularity=" + popularity +
-                ", vote_average=" + vote_average +
-                '}';
-    }
-
     private final String id;
     private final String poster_path;
     private final String overview;
@@ -173,7 +217,8 @@ class Movie implements Parcelable {
     private final String title;
     private final Double popularity;
     private final Double vote_average;
-
+    private Trailer[] trailers;
+    private Review[] reviews;
 
     public String getImage() {
         return poster_path;
@@ -268,12 +313,65 @@ class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    public Trailer[] getTrailers() {
+        return trailers;
+    }
+
+    public void setTrailers(Trailer[] trailerUrl) {
+        this.trailers = trailerUrl;
+    }
+
+    public Review[] getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Review[] reviews) {
+        this.reviews = reviews;
+    }
+}
+
+
+class TrailerResult {
+    private final Trailer[] results;
+    private final String id;
+
+    public TrailerResult(final Trailer[] results, String id) {
+        this.results = results;
+        this.id = id;
+    }
+
+    public Trailer[] getResults() {
+        return results;
+    }
+
+    public String getId() {
+        return id;
+    }
+}
+
+class ReviewResult {
+    private final Review[] results;
+    private final String id;
+
+    public ReviewResult(final Review[] results, String id) {
+        this.results = results;
+        this.id = id;
+    }
+
+    public Review[] getResults() {
+        return results;
+    }
+
+    public String getId() {
+        return id;
+    }
 }
 
 class MovieResult {
     private final Movie[] results;
 
-    MovieResult(final Movie[] results) {
+    public MovieResult(final Movie[] results) {
         this.results = results;
     }
 
