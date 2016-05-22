@@ -1,4 +1,4 @@
-package udacity.android.gkcs.popularmovies;
+package udacity.android.gkcs.popularmovies.model;
 
 public class Review {
     private final String id;
@@ -30,3 +30,4 @@ public class Review {
         return url;
     }
 }
+

@@ -11,6 +11,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import udacity.android.gkcs.popularmovies.model.Movie;
+import udacity.android.gkcs.popularmovies.model.MovieResult;
+
 public class HttpClient {
     public static final String MOVIE_ADDRESS = "https://api.themoviedb.org/3/movie/";
     private final String LOG_TAG = HttpClient.class.getSimpleName();
@@ -62,7 +65,7 @@ public class HttpClient {
     }
 
     public <T> T getMovieDetails(String movieId, String detailType, Class<T> clazz) {
-        return getMovieDetails(MOVIE_ADDRESS + movieId + "/" + detailType, clazz);
+        return getMovieDetails(MOVIE_ADDRESS + movieId + "/" + detailType + "?", clazz);
     }
 
     private <T> T getMovieDetails(String url, Class<T> clazz) {

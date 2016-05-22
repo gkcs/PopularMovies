@@ -1,4 +1,4 @@
-package udacity.android.gkcs.popularmovies;
+package udacity.android.gkcs.popularmovies.model;
 
 public class Trailer {
     private final String id;
@@ -53,3 +53,4 @@ public class Trailer {
         return type;
     }
 }
+

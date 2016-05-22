@@ -2,11 +2,11 @@ package udacity.android.gkcs.popularmovies;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import udacity.android.gkcs.popularmovies.fragment.MovieFragment;
 
 public class MainActivity extends ActionBarActivity {
 
