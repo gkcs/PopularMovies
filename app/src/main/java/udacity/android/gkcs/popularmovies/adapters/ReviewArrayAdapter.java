@@ -14,7 +14,7 @@ import udacity.android.gkcs.popularmovies.R;
 import udacity.android.gkcs.popularmovies.model.Review;
 
 public class ReviewArrayAdapter extends ArrayAdapter<Review> {
-    private static final String TAG = MovieArrayAdapter.class.getSimpleName();
+    private static final String TAG = ReviewArrayAdapter.class.getSimpleName();
 
     public ReviewArrayAdapter(Activity context, int resource, List<Review> reviews) {
         super(context, resource, reviews);
@@ -22,13 +22,14 @@ public class ReviewArrayAdapter extends ArrayAdapter<Review> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Review review = getItem(position);
+        final Review review = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.grid_item_movie, parent, false);
+                    R.layout.list_item_review, parent, false);
         }
-        Log.i(TAG, "getView: Setting up review view");
-        ((TextView) convertView.findViewById(R.id.grid_movie_title)).setText(review.getAuthor());
+        Log.i(TAG, "getView: Setting up review view " + review.toString());
+        ((TextView) convertView.findViewById(R.id.review_author)).setText(review.getAuthor());
+        ((TextView) convertView.findViewById(R.id.review_content)).setText(review.getContent());
         return convertView;
     }
 }

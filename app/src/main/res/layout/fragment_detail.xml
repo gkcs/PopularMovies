@@ -58,6 +58,20 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/movie_rating"
                 android:paddingTop="@dimen/activity_vertical_margin" />
+
+            <include
+                android:id="@+id/trailer_list"
+                layout="@layout/trailer_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/movie_release_date" />
+
+            <include
+                android:id="@+id/review_list"
+                layout="@layout/review_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/trailer_list" />
         </RelativeLayout>
     </LinearLayout>
 </ScrollView>

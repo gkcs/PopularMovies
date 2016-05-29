@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/list_review_author"
+        android:id="@+id/review_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
@@ -13,10 +13,10 @@
         android:typeface="sans" />
 
     <TextView
-        android:id="@+id/list_review_content"
+        android:id="@+id/review_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/list_review_author"
+        android:layout_below="@+id/review_author"
         android:textSize="20sp"
         android:textStyle="bold"
         android:typeface="sans" />

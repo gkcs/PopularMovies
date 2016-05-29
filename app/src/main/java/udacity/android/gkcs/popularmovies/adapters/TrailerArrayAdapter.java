@@ -14,7 +14,7 @@ import udacity.android.gkcs.popularmovies.R;
 import udacity.android.gkcs.popularmovies.model.Trailer;
 
 public class TrailerArrayAdapter extends ArrayAdapter<Trailer> {
-    private static final String TAG = MovieArrayAdapter.class.getSimpleName();
+    private static final String TAG = TrailerArrayAdapter.class.getSimpleName();
 
     public TrailerArrayAdapter(Activity context, int resource, List<Trailer> trailers) {
         super(context, resource, trailers);
@@ -22,12 +22,12 @@ public class TrailerArrayAdapter extends ArrayAdapter<Trailer> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Trailer trailer = getItem(position);
+        final Trailer trailer = getItem(position);
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_movie, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_trailer, parent, false);
         }
-        Log.i(TAG, "getView: Setting up trailer view");
-        ((TextView) convertView.findViewById(R.id.grid_movie_title)).setText(trailer.getName());
+        Log.i(TAG, "getView: Setting up trailer view " + trailer.toString());
+        ((TextView) convertView.findViewById(R.id.trailer_name)).setText(trailer.getName());
         return convertView;
     }
 }

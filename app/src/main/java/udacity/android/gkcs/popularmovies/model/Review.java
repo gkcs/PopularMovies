@@ -29,5 +29,15 @@ public class Review {
     public String getUrl() {
         return url;
     }
+
+    @Override
+    public String toString() {
+        return "Review{" +
+                "id='" + id + '\'' +
+                ", content='" + content + '\'' +
+                ", author='" + author + '\'' +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }
 
