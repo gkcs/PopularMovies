@@ -13,10 +13,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -39,6 +40,7 @@ public class DetailFragment extends Fragment {
     private TrailerArrayAdapter trailerArrayAdapter;
     private static final String TAG = DetailFragment.class.getSimpleName();
     private Movie selectedMovie;
+    private ShareActionProvider mShareActionProvider;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -47,30 +49,45 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        reviewArrayAdapter = new ReviewArrayAdapter(getActivity(), R.layout.review_detail, new ArrayList<Review>());
-        trailerArrayAdapter = new TrailerArrayAdapter(getActivity(), R.layout.trailer_detail, new ArrayList<Trailer>());
+        trailerArrayAdapter = new TrailerArrayAdapter(getActivity(), R.layout.fragment_detail, new ArrayList<Trailer>());
         final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        Log.d(TAG, "onCreateView:  STARTED THE VIEWS");
+        Log.d(TAG, "onCreateView: Trailer view to be made");
+        final ListView trailerListView = (ListView) rootView.findViewById(R.id.trailer_list);
+        trailerListView.setAdapter(trailerArrayAdapter);
+        trailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                watchTrailerOnYoutube(trailerArrayAdapter.getItem(position).getKey());
+            }
+        });
+        Log.d(TAG, "onCreateView: Trailer view done");
+
+        reviewArrayAdapter = new ReviewArrayAdapter(getActivity(), R.layout.fragment_detail, new ArrayList<Review>());
+        Log.d(TAG, "onCreateView: Review view to be made");
+        final ListView reviewListView = (ListView) rootView.findViewById(R.id.review_list);
+        reviewListView.setAdapter(reviewArrayAdapter);
+        Log.d(TAG, "onCreateView: Review view done");
+
+        Log.d(TAG, "onCreateView:  Started filling movie details");
         fillMovieData(rootView, getActivity().getIntent());
-        Log.d(TAG, "onCreateView: DONE WITH VIEWS");
+        Log.d(TAG, "onCreateView: Done filling movie details");
         return rootView;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.share_trailer) {
-            shareYouTubeVideo(trailerArrayAdapter.getItem(0).getKey());
-            return true;
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.detail, menu);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.share_trailer));
+        if (reviewArrayAdapter != null && reviewArrayAdapter.getCount() > 0) {
+            mShareActionProvider.setShareIntent(shareYouTubeVideo(trailerArrayAdapter.getItem(0).getKey()));
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
-    private void fillMovieData(View rootView, Intent intent) {
+    private void fillMovieData(final View rootView, final Intent intent) {
         if (intent != null) {
             selectedMovie = intent.getParcelableExtra("movie");
             ((TextView) rootView.findViewById(R.id.movie_title)).setText(selectedMovie.getTitle());
-            final String path = "http://image.tmdb.org/t/p/w185" + selectedMovie.getImage();
+            final String path = String.format(getResources().getString(R.string.image_url), selectedMovie.getImage());
             Picasso.with(getContext()).load(path).into((ImageView) rootView.findViewById(R.id.movie_image));
             final Resources resources = getResources();
             ((TextView) rootView.findViewById(R.id.movie_text))
@@ -82,16 +99,17 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    private void updateTrailerList(Trailer[] trailers) {
+    private void updateTrailerList(final Trailer[] trailers) {
         if (trailers != null) {
             trailerArrayAdapter.clear();
             for (final Trailer trailer : trailers) {
                 trailerArrayAdapter.add(trailer);
             }
         }
+        mShareActionProvider.setShareIntent(shareYouTubeVideo(trailerArrayAdapter.getItem(0).getKey()));
     }
 
-    private void updateReviewList(Review[] reviews) {
+    private void updateReviewList(final Review[] reviews) {
         if (reviews != null) {
             reviewArrayAdapter.clear();
             for (final Review review : reviews) {
@@ -115,15 +133,14 @@ public class DetailFragment extends Fragment {
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key)));
         } catch (ActivityNotFoundException ex) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + key)));
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(getResources().getString(R.string.you_tube_prefix), key))));
         }
     }
 
     private Intent shareYouTubeVideo(final String key) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + key);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getResources().getString(R.string.you_tube_prefix), key));
         return shareIntent;
     }
 
