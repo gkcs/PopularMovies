@@ -3,4 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="review_vertical_margin">20dp</dimen>
+    <dimen name="trailer_vertical_margin">20dp</dimen>
+    <dimen name="inter_list_vertical_margin">10dp</dimen>
+    <dimen name="intra_list_vertical_margin">5dp</dimen>
 </resources>

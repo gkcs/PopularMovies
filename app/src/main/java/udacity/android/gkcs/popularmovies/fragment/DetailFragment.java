@@ -15,20 +15,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import udacity.android.gkcs.popularmovies.HttpClient;
 import udacity.android.gkcs.popularmovies.R;
-import udacity.android.gkcs.popularmovies.adapters.ReviewArrayAdapter;
-import udacity.android.gkcs.popularmovies.adapters.TrailerArrayAdapter;
 import udacity.android.gkcs.popularmovies.model.Movie;
 import udacity.android.gkcs.popularmovies.model.Review;
 import udacity.android.gkcs.popularmovies.model.ReviewResult;
@@ -36,11 +32,13 @@ import udacity.android.gkcs.popularmovies.model.Trailer;
 import udacity.android.gkcs.popularmovies.model.TrailerResult;
 
 public class DetailFragment extends Fragment {
-    private ReviewArrayAdapter reviewArrayAdapter;
-    private TrailerArrayAdapter trailerArrayAdapter;
+    private Review[] reviews;
+    private Trailer[] trailers;
     private static final String TAG = DetailFragment.class.getSimpleName();
     private Movie selectedMovie;
     private ShareActionProvider mShareActionProvider;
+    private View rootView;
+    private ViewGroup container;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -49,37 +47,63 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        trailerArrayAdapter = new TrailerArrayAdapter(getActivity(), R.layout.fragment_detail, new ArrayList<Trailer>());
-        final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        Log.d(TAG, "onCreateView: Trailer view to be made");
-        final ListView trailerListView = (ListView) rootView.findViewById(R.id.trailer_list);
-        trailerListView.setAdapter(trailerArrayAdapter);
-        trailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                watchTrailerOnYoutube(trailerArrayAdapter.getItem(position).getKey());
-            }
-        });
-        Log.d(TAG, "onCreateView: Trailer view done");
-
-        reviewArrayAdapter = new ReviewArrayAdapter(getActivity(), R.layout.fragment_detail, new ArrayList<Review>());
-        Log.d(TAG, "onCreateView: Review view to be made");
-        final ListView reviewListView = (ListView) rootView.findViewById(R.id.review_list);
-        reviewListView.setAdapter(reviewArrayAdapter);
-        Log.d(TAG, "onCreateView: Review view done");
-
+        rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        this.container = container;
+        addTrailersToLayout(rootView);
+        addReviewsToLayout(rootView);
         Log.d(TAG, "onCreateView:  Started filling movie details");
         fillMovieData(rootView, getActivity().getIntent());
         Log.d(TAG, "onCreateView: Done filling movie details");
         return rootView;
     }
 
+    private void addReviewsToLayout(View rootView) {
+        Log.d(TAG, "onCreateView: Review view to be made");
+        final LinearLayout reviewList = (LinearLayout) rootView.findViewById(R.id.review_list);
+        reviewList.removeAllViews();
+        if (reviews != null) {
+            for (final Review review : reviews) {
+                View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_review, container, false);
+                reviewList.addView(view);
+                Log.i(TAG, "getView: Setting up review view " + review.toString());
+                ((TextView) view.findViewById(R.id.review_author)).setText(review.getAuthor());
+                ((TextView) view.findViewById(R.id.review_content)).setText(review.getContent());
+            }
+            Log.d(TAG, "onCreateView: Review view done");
+        } else {
+            Log.d(TAG, "addReviewsToLayout: Empty review list");
+        }
+    }
+
+    private void addTrailersToLayout(View rootView) {
+        Log.d(TAG, "onCreateView: Trailer view to be made");
+        final LinearLayout trailerList = (LinearLayout) rootView.findViewById(R.id.trailer_list);
+        trailerList.removeAllViews();
+        if (trailers != null) {
+            for (final Trailer trailer : trailers) {
+                final View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_trailer, container, false);
+                trailerList.addView(view);
+                Log.i(TAG, "getView: Setting up trailer view " + trailer.toString());
+                ((TextView) view.findViewById(R.id.trailer_name)).setText(trailer.getName());
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        watchTrailerOnYoutube(trailer.getKey());
+                    }
+                });
+            }
+            Log.d(TAG, "onCreateView: Trailer view done");
+        } else {
+            Log.d(TAG, "addTrailersToLayout: Empty trailer list");
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.detail, menu);
+        super.onCreateOptionsMenu(menu, inflater);
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.share_trailer));
-        if (reviewArrayAdapter != null && reviewArrayAdapter.getCount() > 0) {
-            mShareActionProvider.setShareIntent(shareYouTubeVideo(trailerArrayAdapter.getItem(0).getKey()));
+        if (mShareActionProvider != null && reviews != null && reviews.length > 0) {
+            mShareActionProvider.setShareIntent(shareYouTubeVideo(trailers[0].getKey()));
         }
     }
 
@@ -101,20 +125,18 @@ public class DetailFragment extends Fragment {
 
     private void updateTrailerList(final Trailer[] trailers) {
         if (trailers != null) {
-            trailerArrayAdapter.clear();
-            for (final Trailer trailer : trailers) {
-                trailerArrayAdapter.add(trailer);
-            }
+            this.trailers = trailers;
+            addTrailersToLayout(rootView);
         }
-        mShareActionProvider.setShareIntent(shareYouTubeVideo(trailerArrayAdapter.getItem(0).getKey()));
+        if (mShareActionProvider != null && this.trailers != null && this.trailers.length > 0) {
+            mShareActionProvider.setShareIntent(shareYouTubeVideo(this.trailers[0].getKey()));
+        }
     }
 
     private void updateReviewList(final Review[] reviews) {
         if (reviews != null) {
-            reviewArrayAdapter.clear();
-            for (final Review review : reviews) {
-                reviewArrayAdapter.add(review);
-            }
+            this.reviews = reviews;
+            addReviewsToLayout(rootView);
         }
     }
 

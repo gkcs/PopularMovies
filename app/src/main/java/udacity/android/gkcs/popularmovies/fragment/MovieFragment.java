@@ -3,7 +3,6 @@ package udacity.android.gkcs.popularmovies.fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,6 +25,8 @@ import udacity.android.gkcs.popularmovies.R;
 import udacity.android.gkcs.popularmovies.adapters.MovieArrayAdapter;
 import udacity.android.gkcs.popularmovies.model.Movie;
 
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+
 public class MovieFragment extends Fragment {
 
     private static final String TAG = MovieFragment.class.getSimpleName();
@@ -47,7 +48,7 @@ public class MovieFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d(TAG, "onOptionsItemSelected: MENU ITEM SELECTED: " + item.toString());
         if (item.getItemId() == R.id.action_settings) {
-            sortAdapter(PreferenceManager.getDefaultSharedPreferences(getActivity())
+            sortAdapter(getDefaultSharedPreferences(getActivity())
                     .getString(getString(R.string.sort_key),
                             getString(R.string.sort_value)));
             return true;
@@ -81,7 +82,7 @@ public class MovieFragment extends Fragment {
     }
 
     private void getMovieData() {
-        new MoviesTask().execute(PreferenceManager.getDefaultSharedPreferences(getActivity())
+        new MoviesTask().execute(getDefaultSharedPreferences(getActivity())
                 .getString(getString(R.string.sort_key), getString(R.string.sort_value)));
     }
 
@@ -122,9 +123,7 @@ public class MovieFragment extends Fragment {
                 movieAdapter.add(movie);
             }
         }
-        sortAdapter(PreferenceManager.getDefaultSharedPreferences(getActivity())
-                .getString(getString(R.string.sort_key),
-                        getString(R.string.sort_value)));
+        sortAdapter(getDefaultSharedPreferences(getActivity()).getString(getString(R.string.sort_key), getString(R.string.sort_value)));
     }
 
     public void sortAdapter(final String sortingOrder) {
