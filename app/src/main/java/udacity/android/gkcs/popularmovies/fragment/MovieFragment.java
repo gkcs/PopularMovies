@@ -76,7 +76,7 @@ public class MovieFragment extends Fragment {
                 .equals("Favourites")) {
             updateListToOnlyShowFavourites();
         } else {
-            updateListToShowAll();
+            getMovieData();
         }
     }
 
@@ -106,8 +106,7 @@ public class MovieFragment extends Fragment {
     }
 
     private void getMovieData() {
-        new MoviesTask().execute(getDefaultSharedPreferences(getActivity())
-                .getString(getString(R.string.sort_key), getString(R.string.sort_value)));
+        new MoviesTask().execute();
     }
 
     @NonNull
@@ -144,7 +143,7 @@ public class MovieFragment extends Fragment {
         final ContentResolver contentResolver = getContext().getContentResolver();
         final Cursor moviesCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, BaseColumns._ID, null, null);
         final List<Movie> movies = new ArrayList<>();
-        if (moviesCursor.moveToFirst()) {
+        if (moviesCursor != null && moviesCursor.moveToFirst()) {
             while (moviesCursor.moveToNext()) {
                 movies.add(new Movie(moviesCursor.getString(MOVIE_ID),
                         moviesCursor.getString(POSTER_PATH),
@@ -165,14 +164,14 @@ public class MovieFragment extends Fragment {
 
     private void updateListToOnlyShowFavourites() {
         final ContentResolver contentResolver = getContext().getContentResolver();
-        final Cursor favouritesCursor = contentResolver.query(FavouritesColumns.CONTENT_URI, null, BaseColumns._ID, null, null);
+        final Cursor favouritesCursor = contentResolver.query(FavouritesColumns.CONTENT_URI, null, BaseColumns._ID + "=?", null, null);
         final String param[] = new String[1];
         final List<Movie> movies = new ArrayList<>();
-        if (favouritesCursor.moveToFirst()) {
+        if (favouritesCursor != null && favouritesCursor.moveToFirst()) {
             while (favouritesCursor.moveToNext()) {
                 param[0] = favouritesCursor.getString(FAVOURITE_ID);
-                final Cursor movieCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, BaseColumns._ID, param, null);
-                if (movieCursor.moveToFirst()) {
+                final Cursor movieCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, BaseColumns._ID + "=?", param, null);
+                if (movieCursor != null && movieCursor.moveToFirst()) {
                     movies.add(new Movie(movieCursor.getString(MOVIE_ID),
                             movieCursor.getString(POSTER_PATH),
                             movieCursor.getString(OVERVIEW),

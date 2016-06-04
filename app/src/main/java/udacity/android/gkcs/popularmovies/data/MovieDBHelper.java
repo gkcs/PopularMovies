@@ -24,9 +24,9 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 MovieColumns.TITLE + " VARCHAR(64), " +
                 MovieColumns.POPULARITY + " VARCHAR(16)," +
                 MovieColumns.VOTE_AVERAGE + " VARCHAR(16));";
-        final String SQL_CREATE_FAVOURITES_TABLE = "CREATE TABLE " + FavouritesColumns.TABLE_NAME + " ( "
-                + BaseColumns._ID + " INTEGER PRIMARY KEY FOREIGN KEY(" + BaseColumns._ID +
-                ") REFERENCES " + MovieColumns.TABLE_NAME + "(" + BaseColumns._ID + ");";
+        final String SQL_CREATE_FAVOURITES_TABLE = "CREATE TABLE " + FavouritesColumns.TABLE_NAME + " ("
+                + BaseColumns._ID + " INTEGER PRIMARY KEY, FOREIGN KEY(" + BaseColumns._ID +
+                ") REFERENCES " + MovieColumns.TABLE_NAME + "(" + BaseColumns._ID + "));";
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
         db.execSQL(SQL_CREATE_FAVOURITES_TABLE);
     }

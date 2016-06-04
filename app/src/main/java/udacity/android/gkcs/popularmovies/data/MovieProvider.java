@@ -12,19 +12,19 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 
 public class MovieProvider extends ContentProvider {
-    public static final String CONTENT_AUTHORITY = "com.example.android.sunshine.app";
+    public static final String CONTENT_AUTHORITY = "udacity.android.gkcs.popularmovies";
     private static final UriMatcher uriMatcher = buildUriMatcher();
     public static final String PATH_MOVIES = "movie";
-    public static final String FAVOURITE_MOVIE_PATH = PATH_MOVIES + "/favorite";
+    public static final String FAVOURITE_MOVIE_PATH = "favorite";
     public static final int MOVIE_CODE = 100;
-    public static final int FAVOUTIRE_MOVIE_CODE = 101;
+    public static final int FAVOURITE_MOVIE_CODE = 101;
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     private MovieDBHelper movieDBHelper;
 
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(CONTENT_AUTHORITY, PATH_MOVIES, MOVIE_CODE);
-        matcher.addURI(CONTENT_AUTHORITY, FAVOURITE_MOVIE_PATH, FAVOUTIRE_MOVIE_CODE);
+        matcher.addURI(CONTENT_AUTHORITY, FAVOURITE_MOVIE_PATH, FAVOURITE_MOVIE_CODE);
         return matcher;
     }
 
@@ -40,7 +40,7 @@ public class MovieProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case MOVIE_CODE:
                 return ContentResolver.CURSOR_DIR_BASE_TYPE;
-            case FAVOUTIRE_MOVIE_CODE:
+            case FAVOURITE_MOVIE_CODE:
                 return ContentResolver.CURSOR_DIR_BASE_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -52,7 +52,7 @@ public class MovieProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
         switch (uriMatcher.match(uri)) {
-            case FAVOUTIRE_MOVIE_CODE: {
+            case FAVOURITE_MOVIE_CODE: {
                 retCursor = movieDBHelper.getReadableDatabase().query(
                         FavouritesColumns.TABLE_NAME,
                         projection,
@@ -60,8 +60,7 @@ public class MovieProvider extends ContentProvider {
                         selectionArgs,
                         null,
                         null,
-                        sortOrder
-                );
+                        sortOrder);
                 break;
             }
             case MOVIE_CODE: {
@@ -72,8 +71,7 @@ public class MovieProvider extends ContentProvider {
                         selectionArgs,
                         null,
                         null,
-                        sortOrder
-                );
+                        sortOrder);
                 break;
             }
 
@@ -100,7 +98,7 @@ public class MovieProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case FAVOUTIRE_MOVIE_CODE: {
+            case FAVOURITE_MOVIE_CODE: {
                 long _id = db.insert(MovieColumns.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = ContentUris.withAppendedId(FavouritesColumns.CONTENT_URI, _id);
@@ -126,7 +124,7 @@ public class MovieProvider extends ContentProvider {
             case MOVIE_CODE:
                 rowsDeleted = db.delete(MovieColumns.TABLE_NAME, selection, selectionArgs);
                 break;
-            case FAVOUTIRE_MOVIE_CODE:
+            case FAVOURITE_MOVIE_CODE:
                 rowsDeleted = db.delete(FavouritesColumns.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
@@ -147,7 +145,7 @@ public class MovieProvider extends ContentProvider {
             case MOVIE_CODE:
                 rowsUpdated = db.update(MovieColumns.TABLE_NAME, values, selection, selectionArgs);
                 break;
-            case FAVOUTIRE_MOVIE_CODE:
+            case FAVOURITE_MOVIE_CODE:
                 rowsUpdated = db.update(FavouritesColumns.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:

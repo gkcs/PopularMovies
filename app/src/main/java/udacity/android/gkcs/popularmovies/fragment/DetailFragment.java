@@ -1,11 +1,14 @@
 package udacity.android.gkcs.popularmovies.fragment;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
@@ -15,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +29,7 @@ import java.util.Arrays;
 
 import udacity.android.gkcs.popularmovies.HttpClient;
 import udacity.android.gkcs.popularmovies.R;
+import udacity.android.gkcs.popularmovies.data.FavouritesColumns;
 import udacity.android.gkcs.popularmovies.model.Movie;
 import udacity.android.gkcs.popularmovies.model.Review;
 import udacity.android.gkcs.popularmovies.model.ReviewResult;
@@ -48,6 +53,22 @@ public class DetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        final ImageButton button = (ImageButton) rootView.findViewById(R.id.favourite_button);
+        final ContentResolver contentResolver = getContext().getContentResolver();
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ContentValues values = new ContentValues();
+                values.put(BaseColumns._ID, selectedMovie.getId());
+                if (button.isSelected()) {
+                    button.setSelected(true);
+                    contentResolver.insert(FavouritesColumns.CONTENT_URI, values);
+                } else {
+                    button.setSelected(false);
+                    contentResolver.delete(FavouritesColumns.CONTENT_URI, BaseColumns._ID + "=?", new String[]{selectedMovie.getId()});
+                }
+            }
+        });
         this.container = container;
         addTrailersToLayout(rootView);
         addReviewsToLayout(rootView);

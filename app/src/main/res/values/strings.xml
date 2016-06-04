@@ -16,4 +16,8 @@
     <string name="image_url">http://image.tmdb.org/t/p/w185%s</string>
     <string name="view_choice_key">view_choice</string>
     <string name="view_all_value">All</string>
+    <string name="favourite">Favourite</string>
+    <string name="content_authority">udacity.android.gkcs.popularmovies</string>
+    <string name="trailers_title">TRAILERS:</string>
+    <string name="reviews_title">REVIEWS:</string>
 </resources>
