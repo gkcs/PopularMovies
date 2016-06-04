@@ -11,7 +11,6 @@ public class Movie implements Parcelable {
     private final String title;
     private final Double popularity;
     private final Double vote_average;
-
     public String getImage() {
         return poster_path;
     }
@@ -40,7 +39,6 @@ public class Movie implements Parcelable {
         return (id);
     }
 
-
     public Movie(final String id,
                  final String poster_path,
                  final String overview,
@@ -56,6 +54,7 @@ public class Movie implements Parcelable {
         this.popularity = popularity;
         this.vote_average = vote_average;
     }
+
 
     protected Movie(Parcel in) {
         id = in.readString();
@@ -105,5 +104,18 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "id='" + id + '\'' +
+                ", poster_path='" + poster_path + '\'' +
+                ", overview='" + overview + '\'' +
+                ", release_date='" + release_date + '\'' +
+                ", title='" + title + '\'' +
+                ", popularity=" + popularity +
+                ", vote_average=" + vote_average +
+                '}';
+    }
 }
 

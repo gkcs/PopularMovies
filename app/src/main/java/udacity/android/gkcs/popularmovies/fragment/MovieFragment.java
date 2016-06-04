@@ -1,6 +1,7 @@
 package udacity.android.gkcs.popularmovies.fragment;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -141,7 +142,7 @@ public class MovieFragment extends Fragment {
 
     private void updateListToShowAll() {
         final ContentResolver contentResolver = getContext().getContentResolver();
-        final Cursor moviesCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, BaseColumns._ID, null, null);
+        final Cursor moviesCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, null, null, null);
         final List<Movie> movies = new ArrayList<>();
         if (moviesCursor != null && moviesCursor.moveToFirst()) {
             while (moviesCursor.moveToNext()) {
@@ -164,9 +165,9 @@ public class MovieFragment extends Fragment {
 
     private void updateListToOnlyShowFavourites() {
         final ContentResolver contentResolver = getContext().getContentResolver();
-        final Cursor favouritesCursor = contentResolver.query(FavouritesColumns.CONTENT_URI, null, BaseColumns._ID + "=?", null, null);
-        final String param[] = new String[1];
+        final Cursor favouritesCursor = contentResolver.query(FavouritesColumns.CONTENT_URI, null, null, null, null);
         final List<Movie> movies = new ArrayList<>();
+        final String param[] = new String[1];
         if (favouritesCursor != null && favouritesCursor.moveToFirst()) {
             while (favouritesCursor.moveToNext()) {
                 param[0] = favouritesCursor.getString(FAVOURITE_ID);
@@ -216,8 +217,25 @@ public class MovieFragment extends Fragment {
         protected void onPostExecute(Movie[] result) {
             Log.d(TAG, "STARTED FILLING ADAPTER");
             updateMovieList(result);
+            insertIntoDatabase(result);
             Log.d(TAG, "DONE FILLING ADAPTER");
         }
+    }
+
+    private void insertIntoDatabase(final Movie[] movies) {
+        final ContentValues[] contentValues = new ContentValues[movies.length];
+        for (int i = 0; i < movies.length; i++) {
+            contentValues[i] = new ContentValues();
+            Movie movie = movies[i];
+            contentValues[i].put(MovieColumns.OVERVIEW, movie.getOverview());
+            contentValues[i].put(MovieColumns.POPULARITY, movie.getPopularity());
+            contentValues[i].put(MovieColumns.POSTER_PATH, movie.getImage());
+            contentValues[i].put(MovieColumns.RELEASE_DATE, movie.getRelease_date());
+            contentValues[i].put(MovieColumns.TITLE, movie.getTitle());
+            contentValues[i].put(MovieColumns.VOTE_AVERAGE, movie.getVote_average());
+            contentValues[i].put(BaseColumns._ID, movie.getId());
+        }
+        getContext().getContentResolver().bulkInsert(MovieColumns.CONTENT_URI, contentValues);
     }
 }
 

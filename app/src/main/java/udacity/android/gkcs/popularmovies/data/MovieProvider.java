@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 public class MovieProvider extends ContentProvider {
     public static final String CONTENT_AUTHORITY = "udacity.android.gkcs.popularmovies";
@@ -74,10 +75,10 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
-
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        Log.i("Provider-query", "query: Cursor has " + retCursor.getCount() + " rows");
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
@@ -99,11 +100,10 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case FAVOURITE_MOVIE_CODE: {
-                long _id = db.insert(MovieColumns.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = ContentUris.withAppendedId(FavouritesColumns.CONTENT_URI, _id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                long _id = db.insertWithOnConflict(MovieColumns.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+                returnUri = ContentUris.withAppendedId(FavouritesColumns.CONTENT_URI, _id);
+                if (_id <= 0)
+                    Log.d("Provider-insert", "Rows not affected " + uri);
                 break;
             }
             default:
@@ -133,6 +133,8 @@ public class MovieProvider extends ContentProvider {
         // Because a null deletes all rows
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
+        } else {
+            Log.i("Provider-delete:", "delete: No rows deleted");
         }
         return rowsDeleted;
     }

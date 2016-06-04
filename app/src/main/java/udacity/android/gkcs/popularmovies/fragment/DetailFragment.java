@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,6 +45,8 @@ public class DetailFragment extends Fragment {
     private ShareActionProvider mShareActionProvider;
     private View rootView;
     private ViewGroup container;
+    private ContentResolver contentResolver;
+    private ImageButton button;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -53,18 +56,20 @@ public class DetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        final ImageButton button = (ImageButton) rootView.findViewById(R.id.favourite_button);
-        final ContentResolver contentResolver = getContext().getContentResolver();
+        button = (ImageButton) rootView.findViewById(R.id.favourite_button);
+        contentResolver = getContext().getContentResolver();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ContentValues values = new ContentValues();
+                Log.i(TAG, "onClick: Favourite button clicked" + selectedMovie);
+                final ContentValues values = new ContentValues();
                 values.put(BaseColumns._ID, selectedMovie.getId());
-                if (button.isSelected()) {
+                if (!button.isSelected()) {
                     button.setSelected(true);
                     contentResolver.insert(FavouritesColumns.CONTENT_URI, values);
                 } else {
                     button.setSelected(false);
+                    Log.d(TAG, "onClick: movie to be deleted: " + selectedMovie.getId());
                     contentResolver.delete(FavouritesColumns.CONTENT_URI, BaseColumns._ID + "=?", new String[]{selectedMovie.getId()});
                 }
             }
@@ -141,6 +146,8 @@ public class DetailFragment extends Fragment {
                     .setText(String.format(resources.getString(R.string.rating_display), selectedMovie.getVote_average()));
             ((TextView) rootView.findViewById(R.id.movie_release_date))
                     .setText(String.format(resources.getString(R.string.release_date_display), selectedMovie.getRelease_date()));
+            ((TextView) rootView.findViewById(R.id.trailers_title)).setText(R.string.trailers_title);
+            ((TextView) rootView.findViewById(R.id.reviews_title)).setText(R.string.reviews_title);
         }
     }
 
@@ -165,6 +172,16 @@ public class DetailFragment extends Fragment {
     public void onStart() {
         super.onStart();
         getMovieDetails();
+        final Cursor query = contentResolver.query(FavouritesColumns.CONTENT_URI,
+                new String[]{BaseColumns._ID},
+                BaseColumns._ID + "=?",
+                new String[]{selectedMovie.getId()},
+                null);
+        if (query != null && query.moveToFirst()) {
+            button.setSelected(true);
+        } else {
+            button.setSelected(false);
+        }
     }
 
     private void getMovieDetails() {
