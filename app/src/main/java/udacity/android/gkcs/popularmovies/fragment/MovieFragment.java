@@ -1,8 +1,11 @@
 package udacity.android.gkcs.popularmovies.fragment;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,11 +21,14 @@ import android.widget.GridView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import udacity.android.gkcs.popularmovies.DetailActivity;
 import udacity.android.gkcs.popularmovies.HttpClient;
 import udacity.android.gkcs.popularmovies.R;
 import udacity.android.gkcs.popularmovies.adapters.MovieArrayAdapter;
+import udacity.android.gkcs.popularmovies.data.FavouritesColumns;
+import udacity.android.gkcs.popularmovies.data.MovieColumns;
 import udacity.android.gkcs.popularmovies.model.Movie;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
@@ -30,6 +36,14 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 public class MovieFragment extends Fragment {
 
     private static final String TAG = MovieFragment.class.getSimpleName();
+    public static final int FAVOURITE_ID = 0;
+    public static final int MOVIE_ID = 0;
+    public static final int POSTER_PATH = 1;
+    public static final int OVERVIEW = 2;
+    public static final int RELEASE_DATE = 3;
+    public static final int TITLE = 4;
+    public static final int POPULARITY = 5;
+    public static final int VOTE_AVERAGE = 6;
 
     private MovieArrayAdapter movieAdapter;
 
@@ -48,12 +62,22 @@ public class MovieFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d(TAG, "onOptionsItemSelected: MENU ITEM SELECTED: " + item.toString());
         if (item.getItemId() == R.id.action_settings) {
-            sortAdapter(getDefaultSharedPreferences(getActivity())
-                    .getString(getString(R.string.sort_key),
-                            getString(R.string.sort_value)));
+            updateMovieView();
+//            sortAdapter(getDefaultSharedPreferences(getActivity())
+//                    .getString(getString(R.string.sort_key), getString(R.string.sort_value)));
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateMovieView() {
+        if (getDefaultSharedPreferences(getActivity())
+                .getString(getString(R.string.view_choice_key), getString(R.string.view_all_value))
+                .equals("Favourites")) {
+            updateListToOnlyShowFavourites();
+        } else {
+            updateListToShowAll();
+        }
     }
 
     @Override
@@ -78,7 +102,7 @@ public class MovieFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        getMovieData();
+        updateMovieView();
     }
 
     private void getMovieData() {
@@ -114,6 +138,52 @@ public class MovieFragment extends Fragment {
         } else {
             return 0;
         }
+    }
+
+    private void updateListToShowAll() {
+        final ContentResolver contentResolver = getContext().getContentResolver();
+        final Cursor moviesCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, BaseColumns._ID, null, null);
+        final List<Movie> movies = new ArrayList<>();
+        if (moviesCursor.moveToFirst()) {
+            while (moviesCursor.moveToNext()) {
+                movies.add(new Movie(moviesCursor.getString(MOVIE_ID),
+                        moviesCursor.getString(POSTER_PATH),
+                        moviesCursor.getString(OVERVIEW),
+                        moviesCursor.getString(RELEASE_DATE),
+                        moviesCursor.getString(TITLE),
+                        Double.parseDouble(moviesCursor.getString(POPULARITY)),
+                        Double.parseDouble(moviesCursor.getString(VOTE_AVERAGE))));
+
+            }
+        }
+        if (movies.size() > 0) {
+            updateMovieList(movies.toArray(new Movie[movies.size()]));
+        } else {
+            getMovieData();
+        }
+    }
+
+    private void updateListToOnlyShowFavourites() {
+        final ContentResolver contentResolver = getContext().getContentResolver();
+        final Cursor favouritesCursor = contentResolver.query(FavouritesColumns.CONTENT_URI, null, BaseColumns._ID, null, null);
+        final String param[] = new String[1];
+        final List<Movie> movies = new ArrayList<>();
+        if (favouritesCursor.moveToFirst()) {
+            while (favouritesCursor.moveToNext()) {
+                param[0] = favouritesCursor.getString(FAVOURITE_ID);
+                final Cursor movieCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, BaseColumns._ID, param, null);
+                if (movieCursor.moveToFirst()) {
+                    movies.add(new Movie(movieCursor.getString(MOVIE_ID),
+                            movieCursor.getString(POSTER_PATH),
+                            movieCursor.getString(OVERVIEW),
+                            movieCursor.getString(RELEASE_DATE),
+                            movieCursor.getString(TITLE),
+                            Double.parseDouble(movieCursor.getString(POPULARITY)),
+                            Double.parseDouble(movieCursor.getString(VOTE_AVERAGE))));
+                }
+            }
+        }
+        updateMovieList(movies.toArray(new Movie[movies.size()]));
     }
 
     private void updateMovieList(Movie[] movies) {

@@ -6,4 +6,10 @@
         android:defaultValue="@string/sort_value"
         android:entryValues="@array/sort_values"
         android:entries="@array/sort_options" />
+    <ListPreference
+        android:title="View"
+        android:key="@string/view_choice_key"
+        android:defaultValue="@string/view_all_value"
+        android:entryValues="@array/view_choices_values"
+        android:entries="@array/view_choices_options" />
 </PreferenceScreen>
