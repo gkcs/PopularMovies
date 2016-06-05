@@ -6,10 +6,13 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.BaseColumns;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
@@ -25,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.Arrays;
 
@@ -63,20 +67,38 @@ public class DetailFragment extends Fragment {
             public void onClick(View view) {
                 Log.i(TAG, "onClick: Favourite button clicked" + selectedMovie);
                 final ContentValues values = new ContentValues();
-                values.put(BaseColumns._ID, selectedMovie.getId());
+                values.put(FavouritesColumns._ID, selectedMovie.getId());
                 if (!button.isSelected()) {
                     button.setSelected(true);
                     contentResolver.insert(FavouritesColumns.CONTENT_URI, values);
+                    Snackbar.make(view, "Movie added to favourites!", Snackbar.LENGTH_LONG).show();
                 } else {
                     button.setSelected(false);
                     Log.d(TAG, "onClick: movie to be deleted: " + selectedMovie.getId());
-                    contentResolver.delete(FavouritesColumns.CONTENT_URI, BaseColumns._ID + "=?", new String[]{selectedMovie.getId()});
+                    contentResolver.delete(FavouritesColumns.CONTENT_URI, FavouritesColumns._ID + "=?", new String[]{selectedMovie.getId()});
+                    Snackbar.make(view, "Movie removed from favourites!", Snackbar.LENGTH_LONG).show();
                 }
             }
         });
         this.container = container;
         addTrailersToLayout(rootView);
         addReviewsToLayout(rootView);
+        Picasso.with(getContext()).load(R.drawable.star).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                button.setBackgroundDrawable(new BitmapDrawable(bitmap));
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Log.e(TAG, "onBitmapFailed: Bit map failed to load", new RuntimeException());
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                Log.d(TAG, "onPrepareLoad: Preparing to load image into button");
+            }
+        });
         Log.d(TAG, "onCreateView:  Started filling movie details");
         fillMovieData(rootView, getActivity().getIntent());
         Log.d(TAG, "onCreateView: Done filling movie details");
@@ -173,8 +195,8 @@ public class DetailFragment extends Fragment {
         super.onStart();
         getMovieDetails();
         final Cursor query = contentResolver.query(FavouritesColumns.CONTENT_URI,
-                new String[]{BaseColumns._ID},
-                BaseColumns._ID + "=?",
+                new String[]{FavouritesColumns._ID},
+                FavouritesColumns._ID + "=?",
                 new String[]{selectedMovie.getId()},
                 null);
         if (query != null && query.moveToFirst()) {

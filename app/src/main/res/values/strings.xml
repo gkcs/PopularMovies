@@ -20,4 +20,5 @@
     <string name="content_authority">udacity.android.gkcs.popularmovies</string>
     <string name="trailers_title">TRAILERS:</string>
     <string name="reviews_title">REVIEWS:</string>
+    <string name="star_path">drawable/star.png</string>
 </resources>

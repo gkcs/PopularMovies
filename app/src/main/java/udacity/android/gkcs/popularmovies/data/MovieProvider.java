@@ -40,9 +40,9 @@ public class MovieProvider extends ContentProvider {
     public String getType(Uri uri) {
         switch (uriMatcher.match(uri)) {
             case MOVIE_CODE:
-                return ContentResolver.CURSOR_DIR_BASE_TYPE;
+                return ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
             case FAVOURITE_MOVIE_CODE:
-                return ContentResolver.CURSOR_DIR_BASE_TYPE;
+                return ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + FAVOURITE_MOVIE_PATH;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -87,10 +87,8 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = movieDBHelper.getWritableDatabase();
-        final int match = uriMatcher.match(uri);
         Uri returnUri;
-
-        switch (match) {
+        switch (uriMatcher.match(uri)) {
             case MOVIE_CODE: {
                 long _id = db.insert(MovieColumns.TABLE_NAME, null, values);
                 if (_id > 0)
@@ -100,7 +98,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case FAVOURITE_MOVIE_CODE: {
-                long _id = db.insertWithOnConflict(MovieColumns.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+                long _id = db.insert(FavouritesColumns.TABLE_NAME, null, values);
                 returnUri = ContentUris.withAppendedId(FavouritesColumns.CONTENT_URI, _id);
                 if (_id <= 0)
                     Log.d("Provider-insert", "Rows not affected " + uri);
@@ -116,11 +114,10 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = movieDBHelper.getWritableDatabase();
-        final int match = uriMatcher.match(uri);
         int rowsDeleted;
         // this makes delete all rows return the number of rows deleted
         if (null == selection) selection = "1";
-        switch (match) {
+        switch (uriMatcher.match(uri)) {
             case MOVIE_CODE:
                 rowsDeleted = db.delete(MovieColumns.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -162,15 +159,13 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = movieDBHelper.getWritableDatabase();
-        final int match = uriMatcher.match(uri);
-        switch (match) {
+        switch (uriMatcher.match(uri)) {
             case MOVIE_CODE:
                 db.beginTransaction();
                 int count = 0;
                 try {
                     for (final ContentValues value : values) {
-                        long _id = db.insert(MovieColumns.TABLE_NAME, null, value);
-                        if (_id != -1) {
+                        if (db.insert(MovieColumns.TABLE_NAME, null, value) != -1) {
                             count++;
                         }
                     }

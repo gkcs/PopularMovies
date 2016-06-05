@@ -40,8 +40,7 @@
                     android:layout_height="60dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
-                    android:contentDescription="@string/favourite"
-                    android:src="@drawable/star" />
+                    android:contentDescription="@string/favourite"/>
             </RelativeLayout>
 
             <ImageView
@@ -79,7 +78,7 @@
                 android:id="@+id/trailers_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/movie_rating"
+                android:layout_below="@+id/movie_release_date"
                 android:contentDescription="@string/trailers_title"
                 android:paddingTop="@dimen/activity_vertical_margin" />
 

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -140,38 +139,17 @@ public class MovieFragment extends Fragment {
         }
     }
 
-    private void updateListToShowAll() {
-        final ContentResolver contentResolver = getContext().getContentResolver();
-        final Cursor moviesCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, null, null, null);
-        final List<Movie> movies = new ArrayList<>();
-        if (moviesCursor != null && moviesCursor.moveToFirst()) {
-            while (moviesCursor.moveToNext()) {
-                movies.add(new Movie(moviesCursor.getString(MOVIE_ID),
-                        moviesCursor.getString(POSTER_PATH),
-                        moviesCursor.getString(OVERVIEW),
-                        moviesCursor.getString(RELEASE_DATE),
-                        moviesCursor.getString(TITLE),
-                        Double.parseDouble(moviesCursor.getString(POPULARITY)),
-                        Double.parseDouble(moviesCursor.getString(VOTE_AVERAGE))));
-
-            }
-        }
-        if (movies.size() > 0) {
-            updateMovieList(movies.toArray(new Movie[movies.size()]));
-        } else {
-            getMovieData();
-        }
-    }
-
     private void updateListToOnlyShowFavourites() {
         final ContentResolver contentResolver = getContext().getContentResolver();
         final Cursor favouritesCursor = contentResolver.query(FavouritesColumns.CONTENT_URI, null, null, null, null);
         final List<Movie> movies = new ArrayList<>();
-        final String param[] = new String[1];
-        if (favouritesCursor != null && favouritesCursor.moveToFirst()) {
+        if (favouritesCursor != null) {
             while (favouritesCursor.moveToNext()) {
-                param[0] = favouritesCursor.getString(FAVOURITE_ID);
-                final Cursor movieCursor = contentResolver.query(MovieColumns.CONTENT_URI, null, BaseColumns._ID + "=?", param, null);
+                final Cursor movieCursor = contentResolver.query(MovieColumns.CONTENT_URI,
+                        null,
+                        MovieColumns._ID + "=?",
+                        new String[]{favouritesCursor.getString(FAVOURITE_ID)},
+                        null);
                 if (movieCursor != null && movieCursor.moveToFirst()) {
                     movies.add(new Movie(movieCursor.getString(MOVIE_ID),
                             movieCursor.getString(POSTER_PATH),
@@ -226,14 +204,14 @@ public class MovieFragment extends Fragment {
         final ContentValues[] contentValues = new ContentValues[movies.length];
         for (int i = 0; i < movies.length; i++) {
             contentValues[i] = new ContentValues();
-            Movie movie = movies[i];
-            contentValues[i].put(MovieColumns.OVERVIEW, movie.getOverview());
-            contentValues[i].put(MovieColumns.POPULARITY, movie.getPopularity());
-            contentValues[i].put(MovieColumns.POSTER_PATH, movie.getImage());
-            contentValues[i].put(MovieColumns.RELEASE_DATE, movie.getRelease_date());
-            contentValues[i].put(MovieColumns.TITLE, movie.getTitle());
-            contentValues[i].put(MovieColumns.VOTE_AVERAGE, movie.getVote_average());
-            contentValues[i].put(BaseColumns._ID, movie.getId());
+            contentValues[i].put(MovieColumns.OVERVIEW, movies[i].getOverview());
+            contentValues[i].put(MovieColumns.POPULARITY, movies[i].getPopularity());
+            contentValues[i].put(MovieColumns.POSTER_PATH, movies[i].getImage());
+            contentValues[i].put(MovieColumns.RELEASE_DATE, movies[i].getRelease_date());
+            contentValues[i].put(MovieColumns.TITLE, movies[i].getTitle());
+            contentValues[i].put(MovieColumns.VOTE_AVERAGE, movies[i].getVote_average());
+            contentValues[i].put(MovieColumns._ID, movies[i].getId());
+            Log.d(TAG, "insertIntoDatabase: movie added to content values: " + movies[i].getId());
         }
         getContext().getContentResolver().bulkInsert(MovieColumns.CONTENT_URI, contentValues);
     }
