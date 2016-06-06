@@ -2,7 +2,6 @@ package udacity.android.gkcs.popularmovies.fragment;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import udacity.android.gkcs.popularmovies.DetailActivity;
 import udacity.android.gkcs.popularmovies.HttpClient;
 import udacity.android.gkcs.popularmovies.R;
 import udacity.android.gkcs.popularmovies.adapters.MovieArrayAdapter;
@@ -45,6 +43,10 @@ public class MovieFragment extends Fragment {
     public static final int TITLE = 4;
     public static final int POPULARITY = 5;
     public static final int VOTE_AVERAGE = 6;
+
+    public interface Callback {
+        void onItemSelected(Movie movie);
+    }
 
     private MovieArrayAdapter movieAdapter;
     private int mPosition;
@@ -94,8 +96,7 @@ public class MovieFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                startActivity(new Intent(getActivity(), DetailActivity.class)
-                        .putExtra("movie", movieAdapter.getItem(position)));
+                ((Callback) getActivity()).onItemSelected(movieAdapter.getItem(position));
                 mPosition = position;
             }
         });

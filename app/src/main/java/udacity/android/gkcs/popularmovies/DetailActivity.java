@@ -15,8 +15,13 @@ public class DetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailFragment.MOVIE,
+                    getIntent().getParcelableExtra(DetailFragment.MOVIE));
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.movie_detail_container, new DetailFragment())
+                    .add(R.id.movie_detail_container, fragment)
                     .commit();
         }
     }
@@ -31,13 +36,10 @@ public class DetailActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
+        if (item.getItemId() == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

@@ -42,7 +42,7 @@ import udacity.android.gkcs.popularmovies.model.Trailer;
 import udacity.android.gkcs.popularmovies.model.TrailerResult;
 
 public class DetailFragment extends Fragment {
-    public static final String DETAIL_URI = "URI";
+    public static final String MOVIE = "movie";
     private Review[] reviews;
     private Trailer[] trailers;
     private static final String TAG = DetailFragment.class.getSimpleName();
@@ -101,7 +101,7 @@ public class DetailFragment extends Fragment {
             }
         });
         Log.d(TAG, "onCreateView:  Started filling movie details");
-        fillMovieData(rootView, getActivity().getIntent());
+        fillMovieData(rootView, savedInstanceState);
         Log.d(TAG, "onCreateView: Done filling movie details");
         return rootView;
     }
@@ -156,9 +156,9 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    private void fillMovieData(final View rootView, final Intent intent) {
+    private void fillMovieData(final View rootView, final Bundle intent) {
         if (intent != null) {
-            selectedMovie = intent.getParcelableExtra("movie");
+            selectedMovie = intent.getParcelable("movie");
             ((TextView) rootView.findViewById(R.id.movie_title)).setText(selectedMovie.getTitle());
             final String path = String.format(getResources().getString(R.string.image_url), selectedMovie.getImage());
             Picasso.with(getContext()).load(path).into((ImageView) rootView.findViewById(R.id.movie_image));
