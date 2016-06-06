@@ -66,24 +66,24 @@ public class DetailFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i(TAG, "onClick: Favourite button clicked" + selectedMovie);
-                final ContentValues values = new ContentValues();
-                values.put(FavouritesColumns._ID, selectedMovie.getId());
-                if (!button.isSelected()) {
-                    button.setSelected(true);
-                    contentResolver.insert(FavouritesColumns.CONTENT_URI, values);
-                    Snackbar.make(view, "Movie added to favourites!", Snackbar.LENGTH_LONG).show();
-                } else {
-                    button.setSelected(false);
-                    Log.d(TAG, "onClick: movie to be deleted: " + selectedMovie.getId());
-                    contentResolver.delete(FavouritesColumns.CONTENT_URI, FavouritesColumns._ID + "=?", new String[]{selectedMovie.getId()});
-                    Snackbar.make(view, "Movie removed from favourites!", Snackbar.LENGTH_LONG).show();
+                Log.i(TAG, "onClick: Favourite button clicked: " + selectedMovie);
+                if (selectedMovie != null) {
+                    final ContentValues values = new ContentValues();
+                    values.put(FavouritesColumns._ID, selectedMovie.getId());
+                    if (!button.isSelected()) {
+                        button.setSelected(true);
+                        contentResolver.insert(FavouritesColumns.CONTENT_URI, values);
+                        Snackbar.make(view, "Movie added to favourites!", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        button.setSelected(false);
+                        Log.d(TAG, "onClick: movie to be deleted: " + selectedMovie.getId());
+                        contentResolver.delete(FavouritesColumns.CONTENT_URI, FavouritesColumns._ID + "=?", new String[]{selectedMovie.getId()});
+                        Snackbar.make(view, "Movie removed from favourites!", Snackbar.LENGTH_LONG).show();
+                    }
                 }
             }
         });
         this.container = container;
-        addTrailersToLayout(rootView);
-        addReviewsToLayout(rootView);
         Picasso.with(getContext()).load(R.drawable.star).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -102,6 +102,8 @@ public class DetailFragment extends Fragment {
         });
         Log.d(TAG, "onCreateView:  Started filling movie details");
         fillMovieData(rootView, savedInstanceState);
+        addTrailersToLayout(rootView);
+        addReviewsToLayout(rootView);
         Log.d(TAG, "onCreateView: Done filling movie details");
         return rootView;
     }
@@ -118,7 +120,7 @@ public class DetailFragment extends Fragment {
                 ((TextView) view.findViewById(R.id.review_author)).setText(review.getAuthor());
                 ((TextView) view.findViewById(R.id.review_content)).setText(review.getContent());
             }
-            Log.d(TAG, "onCreateView: Review view done");
+            Log.d(TAG, "addReviewsToLayout: Review view done");
         } else {
             Log.d(TAG, "addReviewsToLayout: Empty review list");
         }
@@ -141,7 +143,7 @@ public class DetailFragment extends Fragment {
                     }
                 });
             }
-            Log.d(TAG, "onCreateView: Trailer view done");
+            Log.d(TAG, "addTrailersToLayout: Trailer view done");
         } else {
             Log.d(TAG, "addTrailersToLayout: Empty trailer list");
         }
@@ -156,9 +158,9 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    private void fillMovieData(final View rootView, final Bundle intent) {
-        if (intent != null) {
-            selectedMovie = intent.getParcelable("movie");
+    private void fillMovieData(final View rootView, final Bundle bundle) {
+        if (bundle != null) {
+            selectedMovie = bundle.getParcelable("movie");
             ((TextView) rootView.findViewById(R.id.movie_title)).setText(selectedMovie.getTitle());
             final String path = String.format(getResources().getString(R.string.image_url), selectedMovie.getImage());
             Picasso.with(getContext()).load(path).into((ImageView) rootView.findViewById(R.id.movie_image));
@@ -194,16 +196,18 @@ public class DetailFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        getMovieDetails();
-        final Cursor query = contentResolver.query(FavouritesColumns.CONTENT_URI,
-                new String[]{FavouritesColumns._ID},
-                FavouritesColumns._ID + "=?",
-                new String[]{selectedMovie.getId()},
-                null);
-        if (query != null && query.moveToFirst()) {
-            button.setSelected(true);
-        } else {
-            button.setSelected(false);
+        if (selectedMovie != null) {
+            getMovieDetails();
+            final Cursor query = contentResolver.query(FavouritesColumns.CONTENT_URI,
+                    new String[]{FavouritesColumns._ID},
+                    FavouritesColumns._ID + "=?",
+                    new String[]{selectedMovie.getId()},
+                    null);
+            if (query != null && query.moveToFirst()) {
+                button.setSelected(true);
+            } else {
+                button.setSelected(false);
+            }
         }
     }
 
