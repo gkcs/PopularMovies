@@ -11,6 +11,7 @@ public class Movie implements Parcelable {
     private final String title;
     private final Double popularity;
     private final Double vote_average;
+
     public String getImage() {
         return poster_path;
     }

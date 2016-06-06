@@ -3,7 +3,7 @@ package udacity.android.gkcs.popularmovies.data;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-public class MovieColumns implements BaseColumns{
+public class MovieColumns implements BaseColumns {
     public static final String POSTER_PATH = "poster_path";
     public static final String OVERVIEW = "overview";
     public static final String RELEASE_DATE = "release_date";

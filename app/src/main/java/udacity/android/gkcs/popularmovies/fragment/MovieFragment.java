@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -46,6 +47,9 @@ public class MovieFragment extends Fragment {
     public static final int VOTE_AVERAGE = 6;
 
     private MovieArrayAdapter movieAdapter;
+    private int mPosition;
+    private GridView gridView;
+    private static final String SELECTED_KEY = "selected_position";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,8 +67,6 @@ public class MovieFragment extends Fragment {
         Log.d(TAG, "onOptionsItemSelected: MENU ITEM SELECTED: " + item.toString());
         if (item.getItemId() == R.id.action_settings) {
             updateMovieView();
-//            sortAdapter(getDefaultSharedPreferences(getActivity())
-//                    .getString(getString(R.string.sort_key), getString(R.string.sort_value)));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -86,7 +88,7 @@ public class MovieFragment extends Fragment {
         movieAdapter = new MovieArrayAdapter(getActivity(), R.layout.fragment_main, new ArrayList<Movie>());
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         Log.d(TAG, "onCreateView: GRID VIEW TO BE MADE");
-        final GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
+        gridView = (GridView) rootView.findViewById(R.id.movies_grid);
         Log.d(TAG, "onCreateView: GRID VIEW DONE");
         gridView.setAdapter(movieAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -94,8 +96,12 @@ public class MovieFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 startActivity(new Intent(getActivity(), DetailActivity.class)
                         .putExtra("movie", movieAdapter.getItem(position)));
+                mPosition = position;
             }
         });
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
         return rootView;
     }
 
@@ -103,6 +109,9 @@ public class MovieFragment extends Fragment {
     public void onStart() {
         super.onStart();
         updateMovieView();
+        if (mPosition != ListView.INVALID_POSITION) {
+            gridView.smoothScrollToPosition(mPosition);
+        }
     }
 
     private void getMovieData() {
@@ -162,6 +171,14 @@ public class MovieFragment extends Fragment {
             }
         }
         updateMovieList(movies.toArray(new Movie[movies.size()]));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     private void updateMovieList(Movie[] movies) {

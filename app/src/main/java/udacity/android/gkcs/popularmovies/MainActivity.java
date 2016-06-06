@@ -10,6 +10,9 @@ import udacity.android.gkcs.popularmovies.fragment.MovieFragment;
 
 public class MainActivity extends ActionBarActivity {
 
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+    private boolean mTwoPane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

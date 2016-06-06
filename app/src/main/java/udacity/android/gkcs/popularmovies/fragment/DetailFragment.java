@@ -42,6 +42,7 @@ import udacity.android.gkcs.popularmovies.model.Trailer;
 import udacity.android.gkcs.popularmovies.model.TrailerResult;
 
 public class DetailFragment extends Fragment {
+    public static final String DETAIL_URI = "URI";
     private Review[] reviews;
     private Trailer[] trailers;
     private static final String TAG = DetailFragment.class.getSimpleName();
