@@ -10,4 +10,15 @@
     <string name="content_display">OVERVIEW:\n%1$s</string>
     <string name="rating_display">AVERAGE USER RATING:\n%1$s</string>
     <string name="release_date_display">RELEASE DATE:\n%1$s</string>
+    <string name="action_share">Share</string>
+    <string name="you_tube_prefix">http://www.youtube.com/watch?v=%s</string>
+    <string name="share_using">Share the first trailer</string>
+    <string name="image_url">http://image.tmdb.org/t/p/w185%s</string>
+    <string name="view_choice_key">view_choice</string>
+    <string name="view_all_value">All</string>
+    <string name="favourite">Favourite</string>
+    <string name="content_authority">udacity.android.gkcs.popularmovies</string>
+    <string name="trailers_title">TRAILERS:</string>
+    <string name="reviews_title">REVIEWS:</string>
+    <string name="star_path">drawable/star.png</string>
 </resources>

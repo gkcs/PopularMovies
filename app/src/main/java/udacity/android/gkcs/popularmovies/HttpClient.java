@@ -11,9 +11,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import udacity.android.gkcs.popularmovies.model.Movie;
+import udacity.android.gkcs.popularmovies.model.MovieResult;
+
 public class HttpClient {
     public static final String MOVIE_ADDRESS = "https://api.themoviedb.org/3/movie/";
-    private final String LOG_TAG = HttpClient.class.getSimpleName();
+    private final String TAG = HttpClient.class.getSimpleName();
     private final Gson gson = new Gson();
 
     private static final HttpClient httpclient = new HttpClient();
@@ -26,7 +29,7 @@ public class HttpClient {
         return getMovies(MOVIE_ADDRESS + "top_rated?");
     }
 
-    private Movie[] getMovies(String url) {
+    private Movie[] getMovies(final String url) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String movieJson = null;
@@ -45,7 +48,7 @@ public class HttpClient {
             }
             movieJson = stringBuilder.toString();
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
+            Log.e(TAG, "Error ", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -54,21 +57,22 @@ public class HttpClient {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
+                    Log.e(TAG, "Error closing stream", e);
                 }
             }
         }
         return gson.fromJson(movieJson, MovieResult.class).getResults();
     }
 
-    public <T> T getMovieDetails(String movieId, String detailType, Class<T> clazz) {
-        return getMovieDetails(MOVIE_ADDRESS + movieId + "/" + detailType, clazz);
+    public <T> T getMovieDetails(final String movieId, final String detailType, final Class<T> clazz) {
+        return getMovieDetails(MOVIE_ADDRESS + movieId + "/" + detailType + "?", clazz);
     }
 
-    private <T> T getMovieDetails(String url, Class<T> clazz) {
+    private <T> T getMovieDetails(final String url, final Class<T> clazz) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-        String movieJson = null;
+        String responseJson = null;
+        Log.i(TAG, "getMovieDetails: url: " + url);
         try {
             urlConnection = (HttpURLConnection) new URL(Uri.parse(url)
                     .buildUpon()
@@ -82,9 +86,9 @@ public class HttpClient {
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line).append('\n');
             }
-            movieJson = stringBuilder.toString();
+            responseJson = stringBuilder.toString();
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
+            Log.e(TAG, "Error ", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -93,10 +97,11 @@ public class HttpClient {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
+                    Log.e(TAG, "Error closing stream", e);
                 }
             }
         }
-        return gson.fromJson(movieJson, clazz);
+        Log.i(TAG, "getMovieDetails: json response: " + responseJson);
+        return gson.fromJson(responseJson, clazz);
     }
 }

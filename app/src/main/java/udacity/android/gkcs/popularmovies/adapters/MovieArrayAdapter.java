@@ -1,4 +1,4 @@
-package udacity.android.gkcs.popularmovies;
+package udacity.android.gkcs.popularmovies.adapters;
 
 import android.app.Activity;
 import android.util.Log;
@@ -12,6 +12,9 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import udacity.android.gkcs.popularmovies.R;
+import udacity.android.gkcs.popularmovies.model.Movie;
 
 public class MovieArrayAdapter extends ArrayAdapter<Movie> {
     private static final String LOG_TAG = MovieArrayAdapter.class.getSimpleName();

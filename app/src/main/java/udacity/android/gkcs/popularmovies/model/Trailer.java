@@ -1,4 +1,4 @@
-package udacity.android.gkcs.popularmovies;
+package udacity.android.gkcs.popularmovies.model;
 
 public class Trailer {
     private final String id;
@@ -52,4 +52,18 @@ public class Trailer {
     public String getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+        return "Trailer{" +
+                "id='" + id + '\'' +
+                ", iso_639_1='" + iso_639_1 + '\'' +
+                ", key='" + key + '\'' +
+                ", name='" + name + '\'' +
+                ", site='" + site + '\'' +
+                ", size='" + size + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }
+

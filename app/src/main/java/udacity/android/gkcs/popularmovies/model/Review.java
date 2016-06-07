@@ -1,4 +1,4 @@
-package udacity.android.gkcs.popularmovies;
+package udacity.android.gkcs.popularmovies.model;
 
 public class Review {
     private final String id;
@@ -29,4 +29,15 @@ public class Review {
     public String getUrl() {
         return url;
     }
+
+    @Override
+    public String toString() {
+        return "Review{" +
+                "id='" + id + '\'' +
+                ", content='" + content + '\'' +
+                ", author='" + author + '\'' +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }
+
