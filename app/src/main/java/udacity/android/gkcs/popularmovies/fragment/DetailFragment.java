@@ -101,7 +101,7 @@ public class DetailFragment extends Fragment {
             }
         });
         Log.d(TAG, "onCreateView:  Started filling movie details");
-        fillMovieData(rootView, savedInstanceState);
+        fillMovieData(rootView, getArguments());
         addTrailersToLayout(rootView);
         addReviewsToLayout(rootView);
         Log.d(TAG, "onCreateView: Done filling movie details");

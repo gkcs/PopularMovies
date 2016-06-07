@@ -40,7 +40,7 @@
                     android:layout_height="60dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
-                    android:contentDescription="@string/favourite"/>
+                    android:contentDescription="@string/favourite" />
             </RelativeLayout>
 
             <ImageView
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/trailers_title"
                 android:orientation="vertical"
-                android:paddingTop="@dimen/trailer_vertical_margin" />
+                android:paddingTop="@dimen/inter_list_vertical_margin" />
 
             <TextView
                 android:id="@+id/reviews_title"
@@ -104,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/reviews_title"
                 android:orientation="vertical"
-                android:paddingTop="@dimen/review_vertical_margin" />
+                android:paddingTop="@dimen/inter_list_vertical_margin" />
         </RelativeLayout>
     </LinearLayout>
 </ScrollView>
